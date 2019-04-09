@@ -1,8 +1,6 @@
 import docker
-import pprint
 from datetime import datetime, timedelta
 
-pp = pprint.PrettyPrinter(indent=2)
 unused_containers = []
 
 # Function which checks to see when the container was last active, compares it against the tts
@@ -68,6 +66,7 @@ def stale_manager(container, tts=1, should_remove=False):
 
 def track_containers(containers):
     for unused in unused_containers:
+        unused = unused.rstrip()
         unused_cont = client.containers.get(unused)
         print("Flushing unused container: " + unused_cont.name)
         stale_manager(unused_cont, 1, unused_cont.status == "exited")
@@ -112,6 +111,7 @@ else:
 with open("unused_containers.txt", "w+") as file:
     file.seek(0)
 
-    file.truncate()
+    file.truncate(0)
 
-    file.writelines(unused_containers)
+    for line in unused_containers:
+        file.write(line)
